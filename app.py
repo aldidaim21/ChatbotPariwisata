@@ -13,9 +13,6 @@ st.set_page_config(
 # --- Fungsi untuk Memuat dan Memproses Data ---
 @st.cache_data
 def load_and_prepare_data(filepath):
-    """
-    Memuat data dari file CSV, membersihkan data, dan membuat kolom fitur gabungan.
-    """
     try:
         df = pd.read_csv(filepath)
         df['Description'] = df['Description'].fillna('')
@@ -36,20 +33,15 @@ def load_and_prepare_data(filepath):
 # --- Fungsi untuk Mendapatkan Rekomendasi ---
 @st.cache_resource
 def create_tfidf_model(corpus):
-    """Membuat dan melatih model TF-IDF."""
     tfidf = TfidfVectorizer(stop_words='english')
     tfidf_matrix = tfidf.fit_transform(corpus)
     return tfidf, tfidf_matrix
 
 def get_recommendations(query, df, tfidf, tfidf_matrix, top_n=5):
-    """
-    Menghitung kemiripan dan mengembalikan rekomendasi.
-    """
     query_vec = tfidf.transform([query])
     cosine_sim = cosine_similarity(query_vec, tfidf_matrix).flatten()
     top_indices = cosine_sim.argsort()[:-top_n-1:-1]
     return df.iloc[top_indices]
-
 
 # --- Tampilan Utama Aplikasi Chatbot Streamlit ---
 st.title("🤖 Chatbot Rekomendasi Wisata Indonesia")
@@ -65,7 +57,6 @@ if tourism_df is not None:
             {"role": "assistant", "content": "Halo! Ada yang bisa saya bantu untuk merencanakan liburan Anda di Indonesia?"}
         ]
 
-    # Tampilkan semua pesan dari riwayat chat
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             if isinstance(message["content"], pd.DataFrame):
@@ -73,25 +64,16 @@ if tourism_df is not None:
                 st.markdown(f"Tentu, ini **{len(recommendations)} rekomendasi teratas** yang paling cocok untuk Anda:")
                 for index, row in recommendations.iterrows():
                     st.markdown("---")
-                    col1, col2 = st.columns([1, 2.5])
-                    with col1:
-                        st.image(f"https://placehold.co/400x300/a3e635/000000?text={row['Place_Name'].replace(' ', '+')}", use_column_width=True)
-                    with col2:
-                        st.subheader(row['Place_Name'])
-                        st.markdown(f"**Kategori:** `{row['Category']}` | **Kota:** `{row['City']}`")
-                        st.markdown(f"**Harga Tiket:** `Rp {row['Price']:,}`")
-                        st.success(f"⭐ **Rating:** {row['Rating']} / 5")
-                        st.info(f"**Deskripsi:** {row['Description'][:150]}...")
-                        
-                        # --- PENAMBAHAN TOMBOL NAVIGASI ---
-                        maps_url = f"https://www.google.com/maps/dir/?api=1&destination={row['Lat']},{row['Long']}"
-                        st.link_button("🗺️ Buka Navigasi di Google Maps", maps_url)
-                        # ------------------------------------
-                        
+                    st.subheader(row['Place_Name'])
+                    st.markdown(f"**Kategori:** `{row['Category']}` | **Kota:** `{row['City']}`")
+                    st.markdown(f"**Harga Tiket:** `Rp {row['Price']:,}`")
+                    st.success(f"⭐ **Rating:** {row['Rating']} / 5")
+                    st.info(f"**Deskripsi:** {row['Description'][:150]}...")
+                    maps_url = f"https://www.google.com/maps/dir/?api=1&destination={row['Lat']},{row['Long']}"
+                    st.link_button("🗺️ Buka Navigasi di Google Maps", maps_url)
             else:
                 st.markdown(message["content"])
 
-    # Terima input dari pengguna
     if prompt := st.chat_input("Apa yang Anda cari?"):
         st.session_state.messages.append({"role": "user", "content": prompt})
         with st.chat_message("user"):
@@ -105,21 +87,14 @@ if tourism_df is not None:
                     st.markdown(f"Tentu, ini **{len(recommendations_df)} rekomendasi teratas** yang paling cocok untuk Anda:")
                     for index, row in recommendations_df.iterrows():
                         st.markdown("---")
-                        col1, col2 = st.columns([1, 2.5])
-                        with col1:
-                            st.image(f"https://placehold.co/400x300/a3e635/000000?text={row['Place_Name'].replace(' ', '+')}", use_column_width=True)
-                        with col2:
-                            st.subheader(row['Place_Name'])
-                            st.markdown(f"**Kategori:** `{row['Category']}` | **Kota:** `{row['City']}`")
-                            st.markdown(f"**Harga Tiket:** `Rp {row['Price']:,}`")
-                            st.success(f"⭐ **Rating:** {row['Rating']} / 5")
-                            st.info(f"**Deskripsi:** {row['Description'][:150]}...")
-                            
-                            # --- PENAMBAHAN TOMBOL NAVIGASI (DI SINI JUGA) ---
-                            maps_url = f"https://www.google.com/maps/dir/?api=1&destination={row['Lat']},{row['Long']}"
-                            st.link_button("🗺️ Buka Navigasi di Google Maps", maps_url)
-                            # ---------------------------------------------
-                    
+                        st.subheader(row['Place_Name'])
+                        st.markdown(f"**Kategori:** `{row['Category']}` | **Kota:** `{row['City']}`")
+                        st.markdown(f"**Harga Tiket:** `Rp {row['Price']:,}`")
+                        st.success(f"⭐ **Rating:** {row['Rating']} / 5")
+                        st.info(f"**Deskripsi:** {row['Description'][:150]}...")
+                        maps_url = f"https://www.google.com/maps/dir/?api=1&destination={row['Lat']},{row['Long']}"
+                        st.link_button("🗺️ Buka Navigasi di Google Maps", maps_url)
+
                     st.session_state.messages.append({"role": "assistant", "content": recommendations_df})
                 else:
                     response = "Maaf, saya tidak dapat menemukan tempat yang cocok dengan deskripsi Anda. Silakan coba kata kunci yang lain."
