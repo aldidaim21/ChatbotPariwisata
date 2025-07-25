@@ -94,7 +94,7 @@ if tourism_df is not None:
                 recommendations_df = get_recommendations(prompt, tourism_df, tfidf_vectorizer, tfidf_matrix, top_n=5)
 
                 if not recommendations_df.empty:
-                    st.markdown(f"Tentu, ini **{len(recommendations_df)} rekomendasi teratas** yang paling cocok untuk Anda:")
+                    st.markdown(f"Tentu, ini **{len(recommendations_df)} rekomendasi** yang paling cocok untuk Anda:")
                     for index, row in recommendations_df.iterrows():
                         st.markdown("---")
                         st.subheader(row['Place_Name'])
