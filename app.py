@@ -13,9 +13,6 @@ st.set_page_config(
 # --- Fungsi untuk Memuat dan Memproses Data ---
 @st.cache_data
 def load_and_prepare_data(filepath):
-    """
-    Memuat data dari file CSV, membersihkan data, dan membuat kolom fitur gabungan.
-    """
     try:
         df = pd.read_csv(filepath)
         df['Description'] = df['Description'].fillna('')
@@ -75,7 +72,7 @@ if tourism_df is not None:
                     st.markdown(f"**Kategori:** `{row['Category']}` | **Kota:** `{row['City']}`")
                     st.markdown(f"**Harga Tiket:** `Rp {row['Price']:,}`")
                     st.success(f"⭐ **Rating:** {row['Rating']} / 5")
-                    st.info(f"**Deskripsi:** {row['Description'][:150]}...")
+                    st.info(f"**Deskripsi:** {row['Description'][:200]}")
                     # --- PENAMBAHAN TOMBOL NAVIGASI ---
                     maps_url = f"https://www.google.com/maps/dir/?api=1&destination={row['Lat']},{row['Long']}"
                     st.link_button("🗺️ Buka Navigasi di Google Maps", maps_url)
@@ -101,7 +98,7 @@ if tourism_df is not None:
                         st.markdown(f"**Kategori:** `{row['Category']}` | **Kota:** `{row['City']}`")
                         st.markdown(f"**Harga Tiket:** `Rp {row['Price']:,}`")
                         st.success(f"⭐ **Rating:** {row['Rating']} / 5")
-                        st.info(f"**Deskripsi:** {row['Description'][:150]}...")
+                        st.info(f"**Deskripsi:** {row['Description']}...")
                         # --- PENAMBAHAN TOMBOL NAVIGASI (DI SINI JUGA) ---
                         maps_url = f"https://www.google.com/maps/dir/?api=1&destination={row['Lat']},{row['Long']}"
                         st.link_button("🗺️ Buka Navigasi di Google Maps", maps_url)
